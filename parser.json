@@ -1,0 +1,85 @@
+{
+    "host": "api.hh.ru",
+    "pathname": "/vacancies",
+    "defaults": {
+        "enable_snippets": true,
+        "clusters": false,
+        "only_with_salary": true,
+        "area": 1,
+        "per_page": 500
+    },
+    "queries": [
+        {
+            "alias": "javascript",
+            "text": "Javascript"
+        },
+        {
+            "alias": "javascript_ember",
+            "text": "Ember"
+        },
+        {
+            "alias": "javascript_angular",
+            "text": "Angular"
+        },
+        {
+            "alias": "javascript_react",
+            "text": "React"
+        },
+        {
+            "alias": "javascript_jquery",
+            "text": "jQuery"
+        },
+        {
+            "alias": "php",
+            "text": "PHP"
+        },
+        {
+            "alias": "php_laravel",
+            "text": "Laravel"
+        },
+        {
+            "alias": "php_symfony",
+            "text": "Symfony"
+        },
+        {
+            "alias": "nodejs",
+            "text": "Node+Js"
+        },
+        {
+            "alias": "nodejs_expressjs",
+            "text": "Express+Js"
+        },
+        {
+            "alias": "python",
+            "text": "Python"
+        },
+        {
+            "alias": "python_django",
+            "text": "Django"
+        },
+        {
+            "alias": "java",
+            "text": "java"
+        },
+        {
+            "alias": "java_android",
+            "text": "Android"
+        },
+        {
+            "alias": "csharp",
+            "text": "C#"
+        },
+        {
+            "alias": "csharp_asp",
+            "text": "Asp.Net"
+        },
+        {
+            "alias": "db_mysql",
+            "text": "MySQL"
+        },
+        {
+            "alias": "db_postgres",
+            "text": "PostgreSQL"
+        }
+    ]
+}
