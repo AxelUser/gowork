@@ -42,11 +42,11 @@
         },
         {
             "alias": "nodejs",
-            "text": "Node+Js"
+            "text": "NodeJs"
         },
         {
             "alias": "nodejs_expressjs",
-            "text": "Express+Js"
+            "text": "ExpressJs"
         },
         {
             "alias": "python",

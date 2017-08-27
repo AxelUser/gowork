@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"gowork/errors"
 	"gowork/models"
+	"gowork/parser/loader"
 	"io/ioutil"
+	"log"
 )
-
-func load() {
-
-}
 
 func save() {
 
@@ -22,16 +20,23 @@ func getParserConfig(configPath string) (*models.ParserConfig, error) {
 		return nil, errors.NewConfigLoadError(fmt.Sprintf("Could not read file '%s'", configPath), fsErr)
 	}
 
-	var config *models.ParserConfig
-	jsonErr := json.Unmarshal(raw, config)
-	if jsonErr != nil || config == nil {
+	var config models.ParserConfig
+	jsonErr := json.Unmarshal(raw, &config)
+	if jsonErr != nil {
 		return nil, errors.NewConfigLoadError(fmt.Sprintf("Could not unmarshal json '%s'", configPath), jsonErr)
 	}
 
-	return config, nil
+	return &config, nil
 }
 
 //Start loading data
 func Start(configPath string) {
-
+	log.Print("Parser started.")
+	config, confErr := getParserConfig(configPath)
+	if confErr != nil {
+		log.Fatal(confErr)
+	} else {
+		log.Print("Config loaded")
+	}
+	loader.Load(*config)
 }
