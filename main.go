@@ -14,10 +14,6 @@ func main() {
 
 	switch use := strings.ToLower(*usecase); use {
 	case "parser":
-		startParsing(*config)
+		parser.Start(*config)
 	}
-}
-
-func startParsing(configPath string) {
-	parser.Start(configPath)
 }

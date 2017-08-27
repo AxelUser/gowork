@@ -4,7 +4,7 @@ package models
 type VacancyStats struct {
 	ID           string
 	URL          string
-	Technologies map[string]string
+	Technologies map[string]float32
 	SalaryFrom   *int
 	SalaryTo     *int
 	Currency     string
@@ -15,7 +15,7 @@ func NewVacancyStats(id string, url string, salaryFrom *int, salaryTo *int, curr
 	return VacancyStats{
 		ID:           id,
 		URL:          url,
-		Technologies: make(map[string]string),
+		Technologies: make(map[string]float32),
 		SalaryFrom:   salaryFrom,
 		SalaryTo:     salaryTo}
 }
