@@ -1,6 +1,5 @@
 {
-    "host": "api.hh.ru",
-    "pathname": "/vacancies",
+    "url": "https://api.hh.ru/vacancies",
     "defaults": {
         "enable_snippets": true,
         "clusters": false,

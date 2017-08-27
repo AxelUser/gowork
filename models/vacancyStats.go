@@ -5,12 +5,13 @@ type VacancyStats struct {
 	ID           string
 	URL          string
 	Technologies map[string]string
-	SalaryFrom   *float32
-	SalaryTo     *float32
+	SalaryFrom   *int
+	SalaryTo     *int
+	Currency     string
 }
 
 // NewVacancyStats creates VacancyStats
-func NewVacancyStats(id string, url string, salaryFrom *float32, salaryTo *float32) VacancyStats {
+func NewVacancyStats(id string, url string, salaryFrom *int, salaryTo *int, currency string) VacancyStats {
 	return VacancyStats{
 		ID:           id,
 		URL:          url,
