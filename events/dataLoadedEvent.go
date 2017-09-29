@@ -3,7 +3,7 @@ package events
 import (
 	"fmt"
 
-	"gowork/models"
+	"github.com/AxelUser/gowork/models"
 )
 
 // DataLoadedEvent is event for loaded data from HeadHunter API

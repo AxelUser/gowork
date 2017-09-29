@@ -4,11 +4,11 @@ import (
 	"flag"
 	"strings"
 
-	"gowork/parser"
+	"github.com/AxelUser/gowork/parser"
 )
 
 func main() {
-	usecase := flag.String("case", "web", "Define use-case for application: 'load', 'train', 'web'")
+	usecase := flag.String("case", "web", "Define use-case for application: 'parser', 'train', 'web'")
 	config := flag.String("config", "", "Define path to parser`s config file")
 	flag.Parse()
 

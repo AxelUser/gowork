@@ -3,11 +3,12 @@ package parser
 import (
 	"encoding/json"
 	"fmt"
-	"gowork/errors"
-	"gowork/models"
-	"gowork/parser/loader"
 	"io/ioutil"
 	"log"
+
+	"github.com/AxelUser/gowork/errors"
+	"github.com/AxelUser/gowork/models"
+	"github.com/AxelUser/gowork/parser/loader"
 )
 
 func save() {

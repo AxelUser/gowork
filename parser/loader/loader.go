@@ -3,13 +3,14 @@ package loader
 import (
 	"encoding/json"
 	"fmt"
-	"gowork/errors"
-	"gowork/events"
-	"gowork/models"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
+
+	"github.com/AxelUser/gowork/errors"
+	"github.com/AxelUser/gowork/events"
+	"github.com/AxelUser/gowork/models"
 )
 
 func createBaseURL(config models.ParserConfig) (string, error) {
@@ -117,7 +118,7 @@ func Load(config models.ParserConfig) ([]models.VacancyStats, error) {
 	if err != nil {
 		return allStats, err
 	}
-	log.Print("Loading vacancies via HeadHunter")
+	log.Printf("Loading vacancies from %s", config.URL)
 
 	allStats, err = loadAll(urls)
 	if err != nil {
