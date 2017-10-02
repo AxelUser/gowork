@@ -11,7 +11,7 @@
             "host": "127.0.0.1",
             "program": "${fileDirname}",
             "env": {},
-            "args": ["--case=parser", "--config=./parser.json"],
+            "args": ["--case=parser", "--config=./configs/parser.json"],
             "showLog": true
         }
     ]
