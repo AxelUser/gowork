@@ -80,5 +80,6 @@
             "alias": "db_postgres",
             "text": "PostgreSQL"
         }
-    ]
+    ],
+    "workers_count": 10
 }

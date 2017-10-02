@@ -77,26 +77,39 @@ func loadDataPerSkill(alias string, url string) ([]models.VacancyStats, error) {
 	return data, nil
 }
 
-func loadDataPerSkillAsync(alias string, url string, eventCh chan<- events.DataLoadedEvent, errCh chan<- error, wg *sync.WaitGroup) {
-	stats, err := loadDataPerSkill(alias, url)
-	if err != nil {
-		errCh <- err
-	} else {
-		eventCh <- events.NewDataLoadedEvent(alias, url, stats)
+func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events.DataLoadedEvent, errCh chan<- error, wg *sync.WaitGroup) {
+	for job := range jobsCh {
+		stats, err := loadDataPerSkill(job.Alias, job.URL)
+		if err != nil {
+			errCh <- err
+		} else {
+			eventCh <- events.NewDataLoadedEvent(job.Alias, job.URL, stats)
+		}
 	}
+
 	wg.Done()
 }
 
-func loadAll(urls map[string]string) ([]models.VacancyStats, error) {
+func loadAll(urls map[string]string, count int) ([]models.VacancyStats, error) {
 	var all []models.VacancyStats
 	dataCh := make(chan events.DataLoadedEvent, len(urls))
 	errCh := make(chan error, len(urls))
+	jobsCh := make(chan models.LoaderJob, len(urls))
 	var wg sync.WaitGroup
-	wg.Add(len(urls))
+
+	wg.Add(count)
+	//create workers for loading vacancies
+	for i := 0; i < count; i++ {
+		go loadDataPerSkillAsync(jobsCh, dataCh, errCh, &wg)
+	}
+
+	log.Printf("Workers in pool: %d\n", count)
 
 	for alias, url := range urls {
-		go loadDataPerSkillAsync(alias, url, dataCh, errCh, &wg)
+		jobsCh <- models.NewLoaderJob(alias, url)
 	}
+	close(jobsCh)
+
 	for i := 0; i < len(urls); i++ {
 		event := <-dataCh
 		log.Printf(event.String())
@@ -120,7 +133,7 @@ func Load(config models.ParserConfig) ([]models.VacancyStats, error) {
 	}
 	log.Printf("Loading vacancies from %s", config.URL)
 
-	allStats, err = loadAll(urls)
+	allStats, err = loadAll(urls, config.WorkersCount)
 	if err != nil {
 		return nil, err
 	}
