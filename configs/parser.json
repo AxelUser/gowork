@@ -10,91 +10,113 @@
     "queries": [
         {
             "alias": "javascript",
-            "text": "Javascript"
+            "caption": "Javascript",
+            "query_text": "Javascript"
         },
         {
             "alias": "javascript_ember",
-            "text": "Ember"
+            "caption": "EmberJS",
+            "query_text": "Ember"
         },
         {
             "alias": "javascript_angular",
-            "text": "Angular"
+            "caption": "AngularJS",
+            "query_text": "Angular"
         },
         {
             "alias": "javascript_react",
-            "text": "React"
+            "caption": "ReactJS",
+            "query_text": "React"
         },
         {
             "alias": "javascript_jquery",
-            "text": "jQuery"
+            "caption": "jQuery",
+            "query_text": "jQuery"
         },
         {
             "alias": "php",
-            "text": "PHP"
+            "caption": "PHP",
+            "query_text": "PHP"
         },
         {
             "alias": "php_laravel",
-            "text": "Laravel"
+            "caption": "Laravel",
+            "query_text": "Laravel"
         },
         {
             "alias": "php_symfony",
-            "text": "Symfony"
+            "caption": "Symfony",
+            "query_text": "Symfony"
         },
         {
             "alias": "nodejs",
-            "text": "NodeJs"
+            "caption": "NodeJs",
+            "query_text": "NodeJs"
         },
         {
             "alias": "nodejs_expressjs",
-            "text": "ExpressJs"
+            "caption": "ExpressJs",
+            "query_text": "ExpressJs"
         },
         {
             "alias": "python",
-            "text": "Python"
+            "caption": "Python",
+            "query_text": "Python"
         },
         {
             "alias": "python_django",
-            "text": "Django"
+            "caption": "Django",
+            "query_text": "Django"
         },
         {
             "alias": "python_tensorflow",
-            "text": "Tensorflow"
+            "caption": "Tensorflow",
+            "query_text": "Tensorflow"
         },
         {
             "alias": "java",
-            "text": "java"
+            "caption": "Java",
+            "query_text": "java"
         },
         {
             "alias": "java_android",
-            "text": "Android"
+            "caption": "Android",
+            "query_text": "Android"
         },
         {
             "alias": "csharp",
-            "text": "C#"
+            "caption": "C#",
+            "query_text": "C#"
         },        
         {
             "alias": "csharp_asp",
-            "text": "Asp.Net"
+            "caption": "Asp.Net",
+            "query_text": "Asp.Net"
         },
         {
             "alias": "cpp",
-            "text": "C++"
+            "caption": "C++",
+            "query_text": "C++"
         },
         {
             "alias": "golang",
-            "text": "Go"
+            "caption": "Go",
+            "query_text": "Go"
         },
         {
             "alias": "db_mysql",
-            "text": "MySQL"
+            "caption": "MySQL",
+            "query_text": "MySQL"
         },
         {
             "alias": "db_postgres",
-            "text": "PostgreSQL"
+            "caption": "PostgreSQL",
+            "query_text": "PostgreSQL"
         },
         {
             "alias": "db_oracle",
-            "text": "Oracle"
+            "caption": "Oracle",
+            "query_text": "Oracle"
         }
     ],
     "workers_count": 20
