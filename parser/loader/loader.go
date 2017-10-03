@@ -161,7 +161,9 @@ func loadAll(urls map[string]string, count int) ([]models.VacancyStats, error) {
 	for i := 0; i < len(urls); i++ {
 		event := <-dataCh
 		log.Println(event.String())
-		all = append(all, event.Data...)
+		if event.IsSuccess() {
+			all = append(all, event.Data...)
+		}
 	}
 	wg.Wait()
 	return all, nil
