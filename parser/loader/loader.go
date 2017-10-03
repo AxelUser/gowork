@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	urlModule "net/url"
+	"strconv"
 	"sync"
 
 	"github.com/AxelUser/gowork/errors"
@@ -14,19 +16,19 @@ import (
 )
 
 func createBaseURL(config models.ParserConfig) (string, error) {
-	req, err := http.NewRequest("GET", config.URL, nil)
+	url, err := urlModule.Parse(config.URL)
 	if err != nil {
-		return "", errors.NewLoadDataError(config.URL, "Could not create request for Base URL", err)
+		return "", errors.NewLoadDataError(config.URL, "Could not parse Base URL", err)
 	}
 
-	q := req.URL.Query()
+	q := url.Query()
 	for k, v := range config.Defaults {
 		q.Add(k, fmt.Sprintf("%v", v))
 	}
 
-	req.URL.RawQuery = q.Encode()
-	url := req.URL.String()
-	return url, nil
+	url.RawQuery = q.Encode()
+	urlString := url.String()
+	return urlString, nil
 }
 
 func createURLs(baseURL string, queries []models.ParserQuery) (map[string]string, error) {
@@ -51,7 +53,21 @@ func createURLs(baseURL string, queries []models.ParserQuery) (map[string]string
 	return skillURLMap, nil
 }
 
-func loadDataPerSkill(alias string, url string) ([]models.VacancyStats, error) {
+func getNextPageURL(alias string, url string, nextPage int) (string, error) {
+	urlBuild, err := urlModule.Parse(url)
+	if err != nil {
+		return "", errors.NewLoadSkillError(alias, "Could not create URL for next page", err)
+	}
+
+	q := urlBuild.Query()
+	q.Set("page", strconv.Itoa(nextPage))
+	urlBuild.RawQuery = q.Encode()
+	nextPageURL := urlBuild.String()
+
+	return nextPageURL, nil
+}
+
+func loadPage(alias string, url string) (*models.VacancySearchPage, error) {
 	res, httpErr := http.Get(url)
 	if httpErr != nil {
 		return nil, errors.NewLoadSkillError(alias, "Could not send GET request", httpErr)
@@ -69,25 +85,58 @@ func loadDataPerSkill(alias string, url string) ([]models.VacancyStats, error) {
 		return nil, errors.NewLoadSkillError(alias, "Could not unmarshal JSON", jsonErr)
 	}
 
+	return &page, nil
+}
+
+func parseVacancyStats(page models.VacancySearchPage) []models.VacancyStats {
 	data := make([]models.VacancyStats, len(page.Items))
 	// Handle empty items and log!
 	for i, v := range page.Items {
 		data[i] = models.NewVacancyStats(v.ID, v.URL, v.Salary.From, v.Salary.To, v.Salary.Currency)
 	}
-	return data, nil
+
+	return data
+}
+
+func isLastPage(page models.VacancySearchPage) bool {
+	return page.Page >= page.Pages-1
 }
 
 func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events.DataLoadedEvent, errCh chan<- error, wg *sync.WaitGroup) {
+	defer wg.Done()
 	for job := range jobsCh {
-		stats, err := loadDataPerSkill(job.Alias, job.URL)
+		pageURL := job.URL
+		var pages []models.VacancySearchPage
+		pageModel, err := loadPage(job.Alias, pageURL)
 		if err != nil {
 			errCh <- err
 		} else {
-			eventCh <- events.NewDataLoadedEvent(job.Alias, job.URL, stats)
+			pages = append(pages, *pageModel)
+			var allStats []models.VacancyStats
+
+			for !isLastPage(*pageModel) {
+				pageURL, err = getNextPageURL(job.Alias, pageURL, pageModel.Page+1)
+				if err != nil {
+					errCh <- err
+					return
+				}
+
+				pageModel, err = loadPage(job.Alias, pageURL)
+				if err != nil {
+					errCh <- err
+					return
+				}
+
+				pages = append(pages, *pageModel)
+			}
+
+			for _, page := range pages {
+				allStats = append(allStats, parseVacancyStats(page)...)
+			}
+			eventCh <- events.NewDataLoadedEvent(job.Alias, job.URL, allStats)
 		}
 	}
 
-	wg.Done()
 }
 
 func loadAll(urls map[string]string, count int) ([]models.VacancyStats, error) {
