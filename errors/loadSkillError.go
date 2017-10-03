@@ -16,6 +16,6 @@ func (e LoadSkillError) Error() string {
 }
 
 // NewLoadSkillError creates LoadSkillError
-func NewLoadSkillError(skills string, message string, inner error) LoadSkillError {
-	return LoadSkillError{Message: message, InnerError: inner}
+func NewLoadSkillError(skill string, message string, inner error) LoadSkillError {
+	return LoadSkillError{Skill: skill, Message: message, InnerError: inner}
 }

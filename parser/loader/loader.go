@@ -9,6 +9,7 @@ import (
 	urlModule "net/url"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/AxelUser/gowork/errors"
 	"github.com/AxelUser/gowork/events"
@@ -171,6 +172,8 @@ func loadAll(urls map[string]string, count int) ([]models.VacancyStats, error) {
 
 // Load data from HeadHunter API
 func Load(config models.ParserConfig) ([]models.VacancyStats, error) {
+	timeStart := time.Now()
+
 	var allStats []models.VacancyStats
 
 	baseURL, err := createBaseURL(config)
@@ -187,7 +190,9 @@ func Load(config models.ParserConfig) ([]models.VacancyStats, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("\nLoaded %d item(s)\n", len(allStats))
+
+	elapsed := time.Since(timeStart)
+	log.Printf("\nLoaded %d item(s) in %s\n", len(allStats), elapsed)
 
 	return allStats, nil
 }

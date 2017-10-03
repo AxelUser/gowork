@@ -18,7 +18,7 @@ func (ev DataLoadedEvent) String() string {
 	if ev.IsSuccess() {
 		return fmt.Sprintf("Loaded data (%d item(s)) for skill '%s' from %s", len(ev.Data), ev.Skill, ev.URL)
 	}
-	return fmt.Sprintf("Could not load data for skill '%s' from %s. Error: %s", ev.Skill, ev.URL, ev.Error)
+	return fmt.Sprintf("Error. %s", ev.Error)
 }
 
 // IsSuccess returns true, if there is no error
