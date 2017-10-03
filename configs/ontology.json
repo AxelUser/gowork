@@ -10,7 +10,7 @@
         "alias": "javascript_ember",
         "caption": "EmberJS",
         "rules": {
-            
+            "javascript": 0.7
         }
     },
     {

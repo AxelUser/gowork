@@ -1,1 +1,1 @@
-go run main.go --case=parser --config=configs\parser.json
+go run main.go --case=parser --config=configs\parser.json --ontology=configs\ontology.json
