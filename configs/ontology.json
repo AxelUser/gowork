@@ -1,0 +1,156 @@
+[
+    {
+        "alias": "javascript",
+        "caption": "Javascript",
+        "rules": {
+
+        }
+    },
+    {
+        "alias": "javascript_ember",
+        "caption": "EmberJS",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "javascript_angular",
+        "caption": "AngularJS",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "javascript_react",
+        "caption": "ReactJS",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "javascript_jquery",
+        "caption": "jQuery",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "php",
+        "caption": "PHP",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "php_laravel",
+        "caption": "Laravel",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "php_symfony",
+        "caption": "Symfony",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "nodejs",
+        "caption": "NodeJs",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "nodejs_expressjs",
+        "caption": "ExpressJs",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "python",
+        "caption": "Python",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "python_django",
+        "caption": "Django",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "python_tensorflow",
+        "caption": "Tensorflow",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "java",
+        "caption": "Java",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "java_android",
+        "caption": "Android",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "csharp",
+        "caption": "C#",
+        "rules": {
+            
+        }
+    },        
+    {
+        "alias": "csharp_asp",
+        "caption": "Asp.Net",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "cpp",
+        "caption": "C++",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "golang",
+        "caption": "Go",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "db_mysql",
+        "caption": "MySQL",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "db_postgres",
+        "caption": "PostgreSQL",
+        "rules": {
+            
+        }
+    },
+    {
+        "alias": "db_oracle",
+        "caption": "Oracle",
+        "rules": {
+            
+        }
+    }
+]
