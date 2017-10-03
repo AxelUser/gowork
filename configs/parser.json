@@ -57,6 +57,10 @@
             "text": "Django"
         },
         {
+            "alias": "python_tensorflow",
+            "text": "Tensorflow"
+        },
+        {
             "alias": "java",
             "text": "java"
         },
@@ -67,10 +71,18 @@
         {
             "alias": "csharp",
             "text": "C#"
-        },
+        },        
         {
             "alias": "csharp_asp",
             "text": "Asp.Net"
+        },
+        {
+            "alias": "cpp",
+            "text": "C++"
+        },
+        {
+            "alias": "golang",
+            "text": "Go"
         },
         {
             "alias": "db_mysql",
@@ -79,7 +91,11 @@
         {
             "alias": "db_postgres",
             "text": "PostgreSQL"
+        },
+        {
+            "alias": "db_oracle",
+            "text": "Oracle"
         }
     ],
-    "workers_count": 10
+    "workers_count": 20
 }

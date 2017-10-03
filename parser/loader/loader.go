@@ -102,14 +102,14 @@ func isLastPage(page models.VacancySearchPage) bool {
 	return page.Page >= page.Pages-1
 }
 
-func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events.DataLoadedEvent, errCh chan<- error, wg *sync.WaitGroup) {
+func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events.DataLoadedEvent, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for job := range jobsCh {
 		pageURL := job.URL
 		var pages []models.VacancySearchPage
 		pageModel, err := loadPage(job.Alias, pageURL)
 		if err != nil {
-			errCh <- err
+			eventCh <- events.NewDataLoadedEventWithError(job.Alias, job.URL, err)
 		} else {
 			pages = append(pages, *pageModel)
 			var allStats []models.VacancyStats
@@ -117,13 +117,13 @@ func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events
 			for !isLastPage(*pageModel) {
 				pageURL, err = getNextPageURL(job.Alias, pageURL, pageModel.Page+1)
 				if err != nil {
-					errCh <- err
+					eventCh <- events.NewDataLoadedEventWithError(job.Alias, job.URL, err)
 					return
 				}
 
 				pageModel, err = loadPage(job.Alias, pageURL)
 				if err != nil {
-					errCh <- err
+					eventCh <- events.NewDataLoadedEventWithError(job.Alias, job.URL, err)
 					return
 				}
 
@@ -142,14 +142,13 @@ func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events
 func loadAll(urls map[string]string, count int) ([]models.VacancyStats, error) {
 	var all []models.VacancyStats
 	dataCh := make(chan events.DataLoadedEvent, len(urls))
-	errCh := make(chan error, len(urls))
 	jobsCh := make(chan models.LoaderJob, len(urls))
 	var wg sync.WaitGroup
 
 	wg.Add(count)
 	//create workers for loading vacancies
 	for i := 0; i < count; i++ {
-		go loadDataPerSkillAsync(jobsCh, dataCh, errCh, &wg)
+		go loadDataPerSkillAsync(jobsCh, dataCh, &wg)
 	}
 
 	log.Printf("Workers in pool: %d\n", count)
@@ -161,7 +160,7 @@ func loadAll(urls map[string]string, count int) ([]models.VacancyStats, error) {
 
 	for i := 0; i < len(urls); i++ {
 		event := <-dataCh
-		log.Printf(event.String())
+		log.Println(event.String())
 		all = append(all, event.Data...)
 	}
 	wg.Wait()
