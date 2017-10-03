@@ -1,4 +1,4 @@
-# Relationship between Skills and Wages
+# Relationship between Skills and Wages [![Build Status](https://travis-ci.org/AxelUser/gowork.svg?branch=master)](https://travis-ci.org/AxelUser/gowork)
 
 This is an experiment of using neural network on the client-side of the web-application. This app implements simple perceptron, which predicts the salary range for web-developers, but only for the city of Moscow.
 
