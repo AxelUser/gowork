@@ -56,7 +56,7 @@ func checkNormalizerErrorCode(errs []error, code int) error {
 	}
 }
 
-func TestCheckRawDataNoData(t *testing.T) {
+func TestNormalizeRawDataNoData(t *testing.T) {
 	raw := createRawData([]string{"js", "css"}, 10)
 	ontology := createOntology([]string{"js", "css", "html"}, false)
 
@@ -68,7 +68,7 @@ func TestCheckRawDataNoData(t *testing.T) {
 	}
 }
 
-func TestCheckRawDataEmptyRules(t *testing.T) {
+func TestNormalizeRawDataEmptyRules(t *testing.T) {
 	raw := createRawData([]string{"js", "css", "html"}, 10)
 	ontology := createOntology([]string{"js", "css", "html"}, true)
 
@@ -77,5 +77,24 @@ func TestCheckRawDataEmptyRules(t *testing.T) {
 	err := checkNormalizerErrorCode(errs, normalizerErrors.CaseCodeEmptyRules)
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func TestNormalizeRawDataHasDublicates(t *testing.T) {
+	t.Error("Not implemented")
+}
+
+func TestNormalizeRawDataMissingRulesForSameSkill(t *testing.T) {
+	t.Error("Not implemented")
+}
+
+func TestNormalizeRawData(t *testing.T) {
+	raw := createRawData([]string{"js", "css", "html"}, 10)
+	ontology := createOntology([]string{"js", "css", "html"}, false)
+
+	data, _ := NormalizeRawData(ontology, raw)
+
+	if data == nil {
+		t.Error("Empty collection")
 	}
 }
