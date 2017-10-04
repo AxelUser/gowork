@@ -140,8 +140,8 @@ func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events
 
 }
 
-func loadAll(urls map[string]string, count int) ([]models.VacancyStats, error) {
-	var all []models.VacancyStats
+func loadAll(urls map[string]string, count int) (map[string][]models.VacancyStats, int, error) {
+	all := make(map[string][]models.VacancyStats)
 	dataCh := make(chan events.DataLoadedEvent, len(urls))
 	jobsCh := make(chan models.LoaderJob, len(urls))
 	var wg sync.WaitGroup
@@ -159,22 +159,24 @@ func loadAll(urls map[string]string, count int) ([]models.VacancyStats, error) {
 	}
 	close(jobsCh)
 
+	totalCount := 0
 	for i := 0; i < len(urls); i++ {
 		event := <-dataCh
 		log.Println(event)
 		if event.IsSuccess() {
-			all = append(all, event.Data...)
+			totalCount += len(event.Data)
+			all[event.Skill] = event.Data
 		}
 	}
 	wg.Wait()
-	return all, nil
+	return all, totalCount, nil
 }
 
 // Load data from HeadHunter API
-func Load(config models.ParserConfig) ([]models.VacancyStats, error) {
+func Load(config models.ParserConfig) (map[string][]models.VacancyStats, error) {
 	timeStart := time.Now()
 
-	var allStats []models.VacancyStats
+	allStats := make(map[string][]models.VacancyStats)
 
 	baseURL, err := createBaseURL(config)
 	if err != nil {
@@ -186,13 +188,13 @@ func Load(config models.ParserConfig) ([]models.VacancyStats, error) {
 	}
 	log.Printf("Loading vacancies from %s", config.URL)
 
-	allStats, err = loadAll(urls, config.WorkersCount)
+	allStats, totalCount, err := loadAll(urls, config.WorkersCount)
 	if err != nil {
 		return nil, err
 	}
 
 	elapsed := time.Since(timeStart)
-	log.Printf("\nLoaded %d item(s) in %s\n", len(allStats), elapsed)
+	log.Printf("\nLoaded %d item(s) in %s\n", totalCount, elapsed)
 
 	return allStats, nil
 }
