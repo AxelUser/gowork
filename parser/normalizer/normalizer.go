@@ -1,16 +1,15 @@
 package normalizer
 
 import (
-	"errors"
-	"strings"
-
+	nErrors "github.com/AxelUser/gowork/errors/normalizerErrors"
 	"github.com/AxelUser/gowork/models"
 )
 
-func checkRawData(ontologyInfos []models.OntologyData, rawData map[string][]models.VacancyStats) error {
+func checkRawData(ontologyInfos []models.OntologyData, rawData map[string][]models.VacancyStats) []error {
 	var missingData []string
 	var missingRules []string
-	errMsg := ""
+
+	var checkingErrors []error
 
 	for _, info := range ontologyInfos {
 		if len(rawData[info.Alias]) == 0 {
@@ -22,25 +21,25 @@ func checkRawData(ontologyInfos []models.OntologyData, rawData map[string][]mode
 	}
 
 	if len(missingData) > 0 {
-		errMsg += "Missing data: " + strings.Join(missingData, ", ") + ". "
+		checkingErrors = append(checkingErrors, nErrors.New(nErrors.CaseCodeMissingData, missingData, nil))
 	}
 
 	if len(missingRules) > 0 {
-		errMsg += "Missing rules: " + strings.Join(missingRules, ", ") + ". "
+		checkingErrors = append(checkingErrors, nErrors.New(nErrors.CaseCodeEmptyRules, missingRules, nil))
 	}
 
-	if errMsg != "" {
-		return errors.New("Normalizing failed. " + errMsg)
-	}
-
-	return nil
+	return checkingErrors
 }
 
+// func resolveDublicates(ontologyInfos []models.OntologyData, plainRawData []models.VacancyStats) ([]models.VacancyStats, int, error) {
+// 	uniqueStatsMap := make([])
+// }
+
 // NormalizeRawData proceeds vacancies and normalize them for training set
-func NormalizeRawData(ontologyInfos []models.OntologyData, rawData map[string][]models.VacancyStats) (map[string][]int, error) {
-	err := checkRawData(ontologyInfos, rawData)
-	if err != nil {
-		return nil, err
+func NormalizeRawData(ontologyInfos []models.OntologyData, rawData map[string][]models.VacancyStats) (map[string][]int, []error) {
+	errs := checkRawData(ontologyInfos, rawData)
+	if len(errs) > 0 {
+		return nil, errs
 	}
 	return nil, nil
 }
