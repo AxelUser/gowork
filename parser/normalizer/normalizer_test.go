@@ -1,13 +1,13 @@
-package normalizer_tests
+package normalizer
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"testing"
 
 	"github.com/AxelUser/gowork/errors/normalizerErrors"
 	"github.com/AxelUser/gowork/models"
-	"github.com/AxelUser/gowork/parser/normalizer"
 )
 
 func createRawData(aliases []string, countPerSkill int) map[string][]models.VacancyStats {
@@ -39,25 +39,43 @@ func createOntology(aliases []string, emptyRules bool) []models.OntologyData {
 	return ontology
 }
 
-// TestCheckRawDataNoData is test for checkRawData
-func TestCheckRawDataNoData(t *testing.T) {
-	raw := createRawData([]string{"js", "css"}, 10)
-	ontology := createOntology([]string{"js", "css", "html"}, false)
-
-	_, errs := normalizer.NormalizeRawData(ontology, raw)
-
+func checkNormalizerErrorCode(errs []error, code int) error {
 	if len(errs) == 1 {
 		switch errs[0].(type) {
 		case normalizerErrors.NormalizerError:
 			e := errs[0].(normalizerErrors.NormalizerError)
-			if e.CaseCode == normalizerErrors.CaseCodeMissingData {
-				return
+			if e.CaseCode == code {
+				return nil
 			}
-			t.Errorf("NormalizerError is must be with code %d: %d", normalizerErrors.CaseCodeMissingData, e.CaseCode)
+			return fmt.Errorf("NormalizerError is must be with code %d: %d", code, e.CaseCode)
 		default:
-			t.Errorf("Error is not NormalizerError: %s", reflect.TypeOf(errs[0]))
+			return fmt.Errorf("Error is not NormalizerError: %s", reflect.TypeOf(errs[0]))
 		}
 	} else {
-		t.Errorf("There are multiple errors: %d", len(errs))
+		return fmt.Errorf("There are multiple errors: %d", len(errs))
+	}
+}
+
+func TestCheckRawDataNoData(t *testing.T) {
+	raw := createRawData([]string{"js", "css"}, 10)
+	ontology := createOntology([]string{"js", "css", "html"}, false)
+
+	_, errs := NormalizeRawData(ontology, raw)
+
+	err := checkNormalizerErrorCode(errs, normalizerErrors.CaseCodeMissingData)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestCheckRawDataEmptyRules(t *testing.T) {
+	raw := createRawData([]string{"js", "css", "html"}, 10)
+	ontology := createOntology([]string{"js", "css", "html"}, true)
+
+	_, errs := NormalizeRawData(ontology, raw)
+
+	err := checkNormalizerErrorCode(errs, normalizerErrors.CaseCodeEmptyRules)
+	if err != nil {
+		t.Error(err)
 	}
 }
