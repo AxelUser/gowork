@@ -31,11 +31,32 @@ func checkRawData(ontologyInfos []models.OntologyData, rawData map[string][]mode
 	return checkingErrors
 }
 
-func resolveDublicates(ontologyInfos []models.OntologyData, plainRawData []models.VacancyStats) ([]models.VacancyStats, int, error) {
-	uniqueStatsIdsMap := make(map[string]models.VacancyStats)
+func getPlainData(groupedData map[string][]models.VacancyStats) []models.VacancyStats {
+	var plainData []models.VacancyStats
 
-	plainData := make([]models.VacancyStats, len(uniqueStatsIdsMap))
-	return plainData, len(plainData), nil
+	for _, group := range groupedData {
+		plainData = append(plainData, group...)
+	}
+
+	return plainData
+}
+
+func resolveDublicates(ontologyInfos []models.OntologyData, plainRawData []models.VacancyStats) ([]models.VacancyStats, int) {
+	uniqueStatsFrequencyMap := make(map[string]int)
+	totalDublicates := 0
+	var uniqueData []models.VacancyStats
+
+	for _, stat := range plainRawData {
+		if _, ok := uniqueStatsFrequencyMap[stat.ID]; ok {
+			uniqueStatsFrequencyMap[stat.ID]++
+			totalDublicates++
+		} else {
+			uniqueStatsFrequencyMap[stat.ID] = 1
+			uniqueData = append(uniqueData, stat)
+		}
+	}
+
+	return uniqueData, totalDublicates
 }
 
 // NormalizeRawData proceeds vacancies and normalize them for training set
