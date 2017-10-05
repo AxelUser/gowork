@@ -8,6 +8,7 @@ import (
 func checkRawData(ontologyInfos []models.OntologyData, rawData map[string][]models.VacancyStats) []error {
 	var missingData []string
 	var missingRules []string
+	var missingRulesForThemselves []string
 
 	var checkingErrors []error
 
@@ -17,6 +18,14 @@ func checkRawData(ontologyInfos []models.OntologyData, rawData map[string][]mode
 		}
 		if len(info.Rules) == 0 {
 			missingRules = append(missingRules, info.Alias)
+			missingRulesForThemselves = append(missingRulesForThemselves, info.Alias)
+		} else {
+			for skill := range info.Rules {
+				if skill == info.Alias {
+					continue
+				}
+				missingRulesForThemselves = append(missingRulesForThemselves, info.Alias)
+			}
 		}
 	}
 
@@ -26,6 +35,11 @@ func checkRawData(ontologyInfos []models.OntologyData, rawData map[string][]mode
 
 	if len(missingRules) > 0 {
 		checkingErrors = append(checkingErrors, nErrors.New(nErrors.CaseCodeEmptyRules, missingRules, nil))
+	}
+
+	if len(missingRulesForThemselves) > 0 {
+		checkingErrors = append(checkingErrors,
+			nErrors.New(nErrors.CaseCodeOntologyMissingRuleForSameSkill, missingRulesForThemselves, nil))
 	}
 
 	return checkingErrors

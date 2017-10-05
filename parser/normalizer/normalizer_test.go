@@ -32,13 +32,21 @@ func createRawData(aliases []string, countPerSkill int, createUnique bool) map[s
 	return statsMap
 }
 
-func createOntology(aliases []string, emptyRules bool) []models.OntologyData {
+func createOntology(aliases []string, emptyRules bool, addRuleForItself bool) []models.OntologyData {
 	var ontology []models.OntologyData
 	for _, alias := range aliases {
 		o := models.OntologyData{Alias: alias, Caption: alias}
 		if !emptyRules {
 			o.Rules = make(map[string]float32)
-			o.Rules[alias] = 1
+			for _, skill := range aliases {
+				if skill == alias {
+					if addRuleForItself {
+						o.Rules[skill] = 1
+					}
+				} else {
+					o.Rules[skill] = 0.1
+				}
+			}
 		}
 		ontology = append(ontology, o)
 	}
@@ -47,25 +55,25 @@ func createOntology(aliases []string, emptyRules bool) []models.OntologyData {
 }
 
 func checkNormalizerErrorCode(errs []error, code int) error {
-	if len(errs) == 1 {
-		switch errs[0].(type) {
-		case normalizerErrors.NormalizerError:
-			e := errs[0].(normalizerErrors.NormalizerError)
-			if e.CaseCode == code {
-				return nil
+	if len(errs) > 0 {
+		for _, err := range errs {
+			switch err.(type) {
+			case normalizerErrors.NormalizerError:
+				e := err.(normalizerErrors.NormalizerError)
+				if e.CaseCode == code {
+					return nil
+				}
+				return fmt.Errorf("NormalizerError is must be with code %d: %d", code, e.CaseCode)
 			}
-			return fmt.Errorf("NormalizerError is must be with code %d: %d", code, e.CaseCode)
-		default:
-			return fmt.Errorf("Error is not NormalizerError: %s", reflect.TypeOf(errs[0]))
 		}
-	} else {
-		return fmt.Errorf("There are multiple errors: %d", len(errs))
+		return fmt.Errorf("Error is not NormalizerError: %s", reflect.TypeOf(errs[0]))
 	}
+	return fmt.Errorf("Expected error")
 }
 
 func TestCheckRawData_NoData_ReturnsError(t *testing.T) {
 	raw := createRawData([]string{"js", "css"}, 10, true)
-	ontology := createOntology([]string{"js", "css", "html"}, false)
+	ontology := createOntology([]string{"js", "css", "html"}, false, true)
 
 	errs := checkRawData(ontology, raw)
 
@@ -77,7 +85,7 @@ func TestCheckRawData_NoData_ReturnsError(t *testing.T) {
 
 func TestCheckRawData_EmptyRules_ReturnsErrors(t *testing.T) {
 	raw := createRawData([]string{"js", "css", "html"}, 10, true)
-	ontology := createOntology([]string{"js", "css", "html"}, true)
+	ontology := createOntology([]string{"js", "css", "html"}, true, false)
 
 	errs := checkRawData(ontology, raw)
 
@@ -87,9 +95,21 @@ func TestCheckRawData_EmptyRules_ReturnsErrors(t *testing.T) {
 	}
 }
 
+func TestCheckRawData_MissingRulesForSameSkill_ReturnsError(t *testing.T) {
+	raw := createRawData([]string{"js", "css", "html"}, 10, true)
+	ontology := createOntology([]string{"js", "css", "html"}, false, false)
+
+	errs := checkRawData(ontology, raw)
+
+	err := checkNormalizerErrorCode(errs, normalizerErrors.CaseCodeOntologyMissingRuleForSameSkill)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestResolveDublicates_HasDublicates_ReturnsNoDublicates(t *testing.T) {
 	raw := createRawData([]string{"js", "css", "html"}, 10, false)
-	ontology := createOntology([]string{"js", "css", "html"}, true)
+	ontology := createOntology([]string{"js", "css", "html"}, true, false)
 	plainData := getPlainData(raw)
 
 	stats, _ := resolveDublicates(ontology, plainData)
@@ -108,7 +128,7 @@ func TestResolveDublicates_HasDublicates_ReturnsNoDublicates(t *testing.T) {
 
 func TestResolveDublicates_HasDublicates_TotalCountEqualsActualCount(t *testing.T) {
 	raw := createRawData([]string{"js", "css", "html"}, 10, false)
-	ontology := createOntology([]string{"js", "css", "html"}, true)
+	ontology := createOntology([]string{"js", "css", "html"}, true, false)
 	plainData := getPlainData(raw)
 
 	_, totalCount := resolveDublicates(ontology, plainData)
@@ -128,24 +148,20 @@ func TestResolveDublicates_HasDublicates_TotalCountEqualsActualCount(t *testing.
 	}
 }
 
-func TestNormalizeRawData_MissingRulesForSameSkill_ReturnsError(t *testing.T) {
-	t.Error("Not implemented")
-}
-
 func TestNormalizeRawData_IsCorrect_ReturnsCollection(t *testing.T) {
 	raw := createRawData([]string{"js", "css", "html"}, 10, true)
-	ontology := createOntology([]string{"js", "css", "html"}, false)
+	ontology := createOntology([]string{"js", "css", "html"}, false, true)
 
 	data, _ := NormalizeRawData(ontology, raw)
 
-	if data == nil {
+	if len(data) == 0 {
 		t.Error("Empty collection")
 	}
 }
 
 func TestNormalizeRawData_IsNotCorrect_ReturnsError(t *testing.T) {
 	raw := createRawData([]string{"js", "css", "html"}, 10, true)
-	ontology := createOntology([]string{"js", "css"}, true)
+	ontology := createOntology([]string{"js", "css"}, true, false)
 
 	_, errs := NormalizeRawData(ontology, raw)
 
