@@ -109,10 +109,9 @@ func TestCheckRawData_MissingRulesForSameSkill_ReturnsError(t *testing.T) {
 
 func TestResolveDublicates_HasDublicates_ReturnsNoDublicates(t *testing.T) {
 	raw := createRawData([]string{"js", "css", "html"}, 10, false)
-	ontology := createOntology([]string{"js", "css", "html"}, true, false)
 	plainData := getPlainData(raw)
 
-	stats, _ := resolveDublicates(ontology, plainData)
+	stats, _ := resolveDublicates(plainData)
 
 	idsMap := make(map[string]bool)
 
@@ -128,10 +127,9 @@ func TestResolveDublicates_HasDublicates_ReturnsNoDublicates(t *testing.T) {
 
 func TestResolveDublicates_HasDublicates_TotalCountEqualsActualCount(t *testing.T) {
 	raw := createRawData([]string{"js", "css", "html"}, 10, false)
-	ontology := createOntology([]string{"js", "css", "html"}, true, false)
 	plainData := getPlainData(raw)
 
-	_, totalCount := resolveDublicates(ontology, plainData)
+	_, totalCount := resolveDublicates(plainData)
 	actualDublicates := 0
 	idsMap := make(map[string]bool)
 

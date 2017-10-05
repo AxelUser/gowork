@@ -55,7 +55,7 @@ func getPlainData(groupedData map[string][]models.VacancyStats) []models.Vacancy
 	return plainData
 }
 
-func resolveDublicates(ontologyInfos []models.OntologyData, plainRawData []models.VacancyStats) ([]models.VacancyStats, int) {
+func resolveDublicates(plainRawData []models.VacancyStats) ([]models.VacancyStats, int) {
 	uniqueStatsFrequencyMap := make(map[string]int)
 	totalDublicates := 0
 	var uniqueData []models.VacancyStats
@@ -73,12 +73,20 @@ func resolveDublicates(ontologyInfos []models.OntologyData, plainRawData []model
 	return uniqueData, totalDublicates
 }
 
+func normalizeInputsAndOutputs(ontology []models.OntologyData, data []models.VacancyStats) ([]float32, []float32) {
+	return nil, nil
+}
+
 // NormalizeRawData proceeds vacancies and normalize them for training set
 func NormalizeRawData(ontologyInfos []models.OntologyData, rawData map[string][]models.VacancyStats) (map[string][]int, []error) {
 	errs := checkRawData(ontologyInfos, rawData)
 	if len(errs) > 0 {
 		return nil, errs
 	}
+
+	plainData := getPlainData(rawData)
+
+	resolveDublicates(plainData)
 
 	return nil, nil
 }
