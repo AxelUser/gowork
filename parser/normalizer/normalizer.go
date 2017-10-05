@@ -31,9 +31,12 @@ func checkRawData(ontologyInfos []models.OntologyData, rawData map[string][]mode
 	return checkingErrors
 }
 
-// func resolveDublicates(ontologyInfos []models.OntologyData, plainRawData []models.VacancyStats) ([]models.VacancyStats, int, error) {
-// 	uniqueStatsMap := make([])
-// }
+func resolveDublicates(ontologyInfos []models.OntologyData, plainRawData []models.VacancyStats) ([]models.VacancyStats, int, error) {
+	uniqueStatsIdsMap := make(map[string]models.VacancyStats)
+
+	plainData := make([]models.VacancyStats, len(uniqueStatsIdsMap))
+	return plainData, len(plainData), nil
+}
 
 // NormalizeRawData proceeds vacancies and normalize them for training set
 func NormalizeRawData(ontologyInfos []models.OntologyData, rawData map[string][]models.VacancyStats) (map[string][]int, []error) {
@@ -41,5 +44,6 @@ func NormalizeRawData(ontologyInfos []models.OntologyData, rawData map[string][]
 	if len(errs) > 0 {
 		return nil, errs
 	}
+
 	return nil, nil
 }

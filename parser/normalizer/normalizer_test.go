@@ -56,11 +56,11 @@ func checkNormalizerErrorCode(errs []error, code int) error {
 	}
 }
 
-func TestNormalizeRawDataNoData(t *testing.T) {
+func TestCheckRawData_NoData_ReturnsError(t *testing.T) {
 	raw := createRawData([]string{"js", "css"}, 10)
 	ontology := createOntology([]string{"js", "css", "html"}, false)
 
-	_, errs := NormalizeRawData(ontology, raw)
+	errs := checkRawData(ontology, raw)
 
 	err := checkNormalizerErrorCode(errs, normalizerErrors.CaseCodeMissingData)
 	if err != nil {
@@ -68,11 +68,11 @@ func TestNormalizeRawDataNoData(t *testing.T) {
 	}
 }
 
-func TestNormalizeRawDataEmptyRules(t *testing.T) {
+func TestCheckRawData_EmptyRules_ReturnsErrors(t *testing.T) {
 	raw := createRawData([]string{"js", "css", "html"}, 10)
 	ontology := createOntology([]string{"js", "css", "html"}, true)
 
-	_, errs := NormalizeRawData(ontology, raw)
+	errs := checkRawData(ontology, raw)
 
 	err := checkNormalizerErrorCode(errs, normalizerErrors.CaseCodeEmptyRules)
 	if err != nil {
@@ -80,15 +80,15 @@ func TestNormalizeRawDataEmptyRules(t *testing.T) {
 	}
 }
 
-func TestNormalizeRawDataHasDublicates(t *testing.T) {
+func TestNormalizeRawData_HasDublicates_ReturnsNoDublicates(t *testing.T) {
 	t.Error("Not implemented")
 }
 
-func TestNormalizeRawDataMissingRulesForSameSkill(t *testing.T) {
+func TestNormalizeRawData_MissingRulesForSameSkill_ReturnsError(t *testing.T) {
 	t.Error("Not implemented")
 }
 
-func TestNormalizeRawData(t *testing.T) {
+func TestNormalizeRawData_IsCorrect_ReturnsCollection(t *testing.T) {
 	raw := createRawData([]string{"js", "css", "html"}, 10)
 	ontology := createOntology([]string{"js", "css", "html"}, false)
 
@@ -96,5 +96,16 @@ func TestNormalizeRawData(t *testing.T) {
 
 	if data == nil {
 		t.Error("Empty collection")
+	}
+}
+
+func TestNormalizeRawData_IsNotCorrect_ReturnsError(t *testing.T) {
+	raw := createRawData([]string{"js", "css", "html"}, 10)
+	ontology := createOntology([]string{"js", "css"}, true)
+
+	_, errs := NormalizeRawData(ontology, raw)
+
+	if len(errs) == 0 {
+		t.Errorf("Has no errors")
 	}
 }
