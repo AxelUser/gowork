@@ -89,6 +89,28 @@ func loadPage(alias string, url string) (*models.VacancySearchPage, error) {
 	return &page, nil
 }
 
+func loadAllPages(alias string, firstPageURL string, firstPage models.VacancySearchPage) ([]models.VacancySearchPage, error) {
+	pages := []models.VacancySearchPage{firstPage}
+	pageURL := firstPageURL
+	currentPage := &firstPage
+
+	for !isLastPage(*currentPage) {
+		pageURL, err := getNextPageURL(alias, pageURL, currentPage.Page+1)
+		if err != nil {
+			return pages, err
+		}
+
+		currentPage, err = loadPage(alias, pageURL)
+		if err != nil {
+			return pages, err
+		}
+
+		pages = append(pages, *currentPage)
+	}
+
+	return pages, nil
+}
+
 func parseVacancyStats(page models.VacancySearchPage) []models.VacancyStats {
 	data := make([]models.VacancyStats, len(page.Items))
 	// Handle empty items and log!
@@ -107,37 +129,19 @@ func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events
 	defer wg.Done()
 	for job := range jobsCh {
 		pageURL := job.URL
-		var pages []models.VacancySearchPage
 		pageModel, err := loadPage(job.Alias, pageURL)
 		if err != nil {
-			eventCh <- events.NewDataLoadedEventWithError(job.Alias, job.URL, err)
+			eventCh <- events.NewDataLoadedEventWithError(job.Alias, job.URL, nil, err)
 		} else {
-			pages = append(pages, *pageModel)
+			pages, err := loadAllPages(job.Alias, pageURL, *pageModel)
 			var allStats []models.VacancyStats
-
-			for !isLastPage(*pageModel) {
-				pageURL, err = getNextPageURL(job.Alias, pageURL, pageModel.Page+1)
-				if err != nil {
-					eventCh <- events.NewDataLoadedEventWithError(job.Alias, job.URL, err)
-					return
-				}
-
-				pageModel, err = loadPage(job.Alias, pageURL)
-				if err != nil {
-					eventCh <- events.NewDataLoadedEventWithError(job.Alias, job.URL, err)
-					return
-				}
-
-				pages = append(pages, *pageModel)
-			}
-
 			for _, page := range pages {
 				allStats = append(allStats, parseVacancyStats(page)...)
 			}
-			eventCh <- events.NewDataLoadedEvent(job.Alias, job.URL, allStats)
+
+			eventCh <- events.NewDataLoadedEventWithError(job.Alias, pageURL, allStats, err)
 		}
 	}
-
 }
 
 func loadAll(urls map[string]string, count int) (map[string][]models.VacancyStats, int, error) {
@@ -163,7 +167,7 @@ func loadAll(urls map[string]string, count int) (map[string][]models.VacancyStat
 	for i := 0; i < len(urls); i++ {
 		event := <-dataCh
 		log.Println(event)
-		if event.IsSuccess() {
+		if event.HasData() {
 			totalCount += len(event.Data)
 			all[event.Skill] = event.Data
 		}
