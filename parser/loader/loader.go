@@ -172,7 +172,10 @@ func loadAll(urls map[string]string, count int) (map[string][]models.VacancyStat
 			all[event.Skill] = event.Data
 		}
 	}
+
+	log.Println("Waiting for workers to complete their jobs")
 	wg.Wait()
+
 	return all, totalCount, nil
 }
 
@@ -198,7 +201,7 @@ func Load(config models.ParserConfig) (map[string][]models.VacancyStats, error) 
 	}
 
 	elapsed := time.Since(timeStart)
-	log.Printf("\nLoaded %d item(s) in %s\n", totalCount, elapsed)
+	log.Printf("Loaded %d item(s) in %s\n", totalCount, elapsed)
 
 	return allStats, nil
 }
