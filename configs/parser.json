@@ -5,7 +5,7 @@
         "clusters": false,
         "only_with_salary": true,
         "area": 1,
-        "per_page": 500
+        "per_page": 100
     },
     "queries": [
         {

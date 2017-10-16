@@ -86,6 +86,11 @@ func loadPage(alias string, url string) (*models.VacancySearchPage, error) {
 		return nil, errors.NewLoadSkillError(alias, "Could not unmarshal JSON", jsonErr)
 	}
 
+	if len(page.Errors) > 0 {
+		apiErr := page.Errors[0]
+		return nil, errors.NewLoadSkillError(alias, apiErr.Type+" <"+apiErr.Value+">", nil)
+	}
+
 	return &page, nil
 }
 

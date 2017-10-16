@@ -68,4 +68,8 @@ type VacancySearchPage struct {
 	AlternateURL string      `json:"alternate_url"`
 	PerPage      int         `json:"per_page"`
 	Page         int         `json:"page"`
+	Errors       []struct {
+		Type  string `json:"type"`
+		Value string `json:"value"`
+	} `json:"errors"`
 }
