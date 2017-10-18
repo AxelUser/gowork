@@ -9,9 +9,10 @@
             "remotePath": "",
             "port": 2345,
             "host": "127.0.0.1",
-            "program": "${fileDirname}",
+            "program": "${workspaceRoot}/main.go",
+            "cwd": "${workspaceRoot}",
             "env": {},
-            "args": ["--case=parser", "--config=./configs/parser.json"],
+            "args": ["--case=parser", "--config=./configs/parser.json", "--ontology=configs/ontology.json"],
             "showLog": true
         }
     ]

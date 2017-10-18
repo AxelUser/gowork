@@ -56,16 +56,17 @@ func getPlainData(groupedData map[string][]models.VacancyStats) []models.Vacancy
 }
 
 func resolveDublicates(plainRawData []models.VacancyStats) ([]models.VacancyStats, int) {
-	uniqueStatsFrequencyMap := make(map[string]int)
+	uniqueStatsMap := make(map[string]models.VacancyStats)
 	totalDublicates := 0
 	var uniqueData []models.VacancyStats
 
 	for _, stat := range plainRawData {
-		if _, ok := uniqueStatsFrequencyMap[stat.ID]; ok {
-			uniqueStatsFrequencyMap[stat.ID]++
+		if _, ok := uniqueStatsMap[stat.ID]; ok {
+			// Adds skill for what it was loaded
+			uniqueStatsMap[stat.ID].AddSkill(stat.Skills[0])
 			totalDublicates++
 		} else {
-			uniqueStatsFrequencyMap[stat.ID] = 1
+			uniqueStatsMap[stat.ID] = stat
 			uniqueData = append(uniqueData, stat)
 		}
 	}

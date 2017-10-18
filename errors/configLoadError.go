@@ -11,7 +11,7 @@ type ConfigLoadError struct {
 }
 
 func (e ConfigLoadError) Error() string {
-	return fmt.Sprintf("Could not load parser`s config: %s", e.Message)
+	return fmt.Sprintf("Could not load config: %s", e.Message)
 }
 
 // NewConfigLoadError creates ConfigLoadError

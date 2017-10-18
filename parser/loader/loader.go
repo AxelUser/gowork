@@ -116,11 +116,11 @@ func loadAllPages(alias string, firstPageURL string, firstPage models.VacancySea
 	return pages, nil
 }
 
-func parseVacancyStats(page models.VacancySearchPage) []models.VacancyStats {
+func parseVacancyStats(alias string, page models.VacancySearchPage) []models.VacancyStats {
 	data := make([]models.VacancyStats, len(page.Items))
 	// Handle empty items and log!
 	for i, v := range page.Items {
-		data[i] = models.NewVacancyStats(v.ID, v.URL, v.Salary.From, v.Salary.To, v.Salary.Currency)
+		data[i] = models.NewVacancyStats(v.ID, v.URL, v.Salary.From, v.Salary.To, v.Salary.Currency, alias)
 	}
 
 	return data
@@ -141,7 +141,7 @@ func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events
 			pages, err := loadAllPages(job.Alias, pageURL, *pageModel)
 			var allStats []models.VacancyStats
 			for _, page := range pages {
-				allStats = append(allStats, parseVacancyStats(page)...)
+				allStats = append(allStats, parseVacancyStats(job.Alias, page)...)
 			}
 
 			eventCh <- events.NewDataLoadedEventWithError(job.Alias, pageURL, allStats, err)

@@ -24,7 +24,7 @@ func createRawData(aliases []string, countPerSkill int, createUnique bool) map[s
 			} else {
 				id = "1"
 			}
-			s := models.NewVacancyStats(id, "test.com", &salaryFrom, &salaryTo, "RUB")
+			s := models.NewVacancyStats(id, "test.com", &salaryFrom, &salaryTo, "RUB", alias)
 			stats = append(stats, s)
 		}
 		statsMap[alias] = stats
