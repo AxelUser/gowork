@@ -13,10 +13,12 @@ import (
 
 	"github.com/AxelUser/gowork/errors"
 	"github.com/AxelUser/gowork/events"
-	"github.com/AxelUser/gowork/models"
+	"github.com/AxelUser/gowork/models/api"
+	"github.com/AxelUser/gowork/models/configs"
+	"github.com/AxelUser/gowork/models/dataModels"
 )
 
-func createBaseURL(config models.ParserConfig) (string, error) {
+func createBaseURL(config configs.ParserConfig) (string, error) {
 	url, err := urlModule.Parse(config.URL)
 	if err != nil {
 		return "", errors.NewLoadDataError(config.URL, "Could not parse Base URL", err)
@@ -32,7 +34,7 @@ func createBaseURL(config models.ParserConfig) (string, error) {
 	return urlString, nil
 }
 
-func createURLs(baseURL string, queries []models.ParserQuery) (map[string]string, error) {
+func createURLs(baseURL string, queries []configs.ParserQuery) (map[string]string, error) {
 	skillURLMap := make(map[string]string)
 
 	for _, query := range queries {
@@ -68,7 +70,7 @@ func getNextPageURL(alias string, url string, nextPage int) (string, error) {
 	return nextPageURL, nil
 }
 
-func loadPage(alias string, url string) (*models.VacancySearchPage, error) {
+func loadPage(alias string, url string) (*api.VacancySearchPage, error) {
 	res, httpErr := http.Get(url)
 	if httpErr != nil {
 		return nil, errors.NewLoadSkillError(alias, "Could not send GET request", httpErr)
@@ -80,7 +82,7 @@ func loadPage(alias string, url string) (*models.VacancySearchPage, error) {
 		return nil, errors.NewLoadSkillError(alias, "Could not read data from Body", bodyErr)
 	}
 
-	var page models.VacancySearchPage
+	var page api.VacancySearchPage
 	jsonErr := json.Unmarshal(body, &page)
 	if jsonErr != nil {
 		return nil, errors.NewLoadSkillError(alias, "Could not unmarshal JSON", jsonErr)
@@ -94,8 +96,8 @@ func loadPage(alias string, url string) (*models.VacancySearchPage, error) {
 	return &page, nil
 }
 
-func loadAllPages(alias string, firstPageURL string, firstPage models.VacancySearchPage) ([]models.VacancySearchPage, error) {
-	pages := []models.VacancySearchPage{firstPage}
+func loadAllPages(alias string, firstPageURL string, firstPage api.VacancySearchPage) ([]api.VacancySearchPage, error) {
+	pages := []api.VacancySearchPage{firstPage}
 	pageURL := firstPageURL
 	currentPage := &firstPage
 
@@ -116,21 +118,21 @@ func loadAllPages(alias string, firstPageURL string, firstPage models.VacancySea
 	return pages, nil
 }
 
-func parseVacancyStats(alias string, page models.VacancySearchPage) []models.VacancyStats {
-	data := make([]models.VacancyStats, len(page.Items))
+func parseVacancyStats(alias string, page api.VacancySearchPage) []dataModels.VacancyStats {
+	data := make([]dataModels.VacancyStats, len(page.Items))
 	// Handle empty items and log!
 	for i, v := range page.Items {
-		data[i] = models.NewVacancyStats(v.ID, v.URL, v.Salary.From, v.Salary.To, v.Salary.Currency, alias)
+		data[i] = dataModels.NewVacancyStats(v.ID, v.URL, v.Salary.From, v.Salary.To, v.Salary.Currency, alias)
 	}
 
 	return data
 }
 
-func isLastPage(page models.VacancySearchPage) bool {
+func isLastPage(page api.VacancySearchPage) bool {
 	return page.Page >= page.Pages-1
 }
 
-func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events.DataLoadedEvent, wg *sync.WaitGroup) {
+func loadDataPerSkillAsync(jobsCh <-chan dataModels.LoaderJob, eventCh chan<- events.DataLoadedEvent, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for job := range jobsCh {
 		pageURL := job.URL
@@ -139,7 +141,7 @@ func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events
 			eventCh <- events.NewDataLoadedEventWithError(job.Alias, job.URL, nil, err)
 		} else {
 			pages, err := loadAllPages(job.Alias, pageURL, *pageModel)
-			var allStats []models.VacancyStats
+			var allStats []dataModels.VacancyStats
 			for _, page := range pages {
 				allStats = append(allStats, parseVacancyStats(job.Alias, page)...)
 			}
@@ -149,10 +151,10 @@ func loadDataPerSkillAsync(jobsCh <-chan models.LoaderJob, eventCh chan<- events
 	}
 }
 
-func loadAll(urls map[string]string, count int) (map[string][]models.VacancyStats, int, error) {
-	all := make(map[string][]models.VacancyStats)
+func loadAll(urls map[string]string, count int) (map[string][]dataModels.VacancyStats, int, error) {
+	all := make(map[string][]dataModels.VacancyStats)
 	dataCh := make(chan events.DataLoadedEvent, len(urls))
-	jobsCh := make(chan models.LoaderJob, len(urls))
+	jobsCh := make(chan dataModels.LoaderJob, len(urls))
 	var wg sync.WaitGroup
 
 	wg.Add(count)
@@ -164,7 +166,7 @@ func loadAll(urls map[string]string, count int) (map[string][]models.VacancyStat
 	log.Printf("Workers in pool: %d\n", count)
 
 	for alias, url := range urls {
-		jobsCh <- models.NewLoaderJob(alias, url)
+		jobsCh <- dataModels.NewLoaderJob(alias, url)
 	}
 	close(jobsCh)
 
@@ -185,10 +187,10 @@ func loadAll(urls map[string]string, count int) (map[string][]models.VacancyStat
 }
 
 // Load data from HeadHunter API
-func Load(config models.ParserConfig) (map[string][]models.VacancyStats, error) {
+func Load(config configs.ParserConfig) (map[string][]dataModels.VacancyStats, error) {
 	timeStart := time.Now()
 
-	allStats := make(map[string][]models.VacancyStats)
+	allStats := make(map[string][]dataModels.VacancyStats)
 
 	baseURL, err := createBaseURL(config)
 	if err != nil {

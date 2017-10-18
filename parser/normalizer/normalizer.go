@@ -2,10 +2,11 @@ package normalizer
 
 import (
 	nErrors "github.com/AxelUser/gowork/errors/normalizerErrors"
-	"github.com/AxelUser/gowork/models"
+	"github.com/AxelUser/gowork/models/configs"
+	"github.com/AxelUser/gowork/models/dataModels"
 )
 
-func checkRawData(ontologyInfos []models.OntologyData, rawData map[string][]models.VacancyStats) []error {
+func checkRawData(ontologyInfos []configs.OntologyData, rawData map[string][]dataModels.VacancyStats) []error {
 	var missingData []string
 	var missingRules []string
 	var missingRulesForThemselves []string
@@ -45,8 +46,8 @@ func checkRawData(ontologyInfos []models.OntologyData, rawData map[string][]mode
 	return checkingErrors
 }
 
-func getPlainData(groupedData map[string][]models.VacancyStats) []models.VacancyStats {
-	var plainData []models.VacancyStats
+func getPlainData(groupedData map[string][]dataModels.VacancyStats) []dataModels.VacancyStats {
+	var plainData []dataModels.VacancyStats
 
 	for _, group := range groupedData {
 		plainData = append(plainData, group...)
@@ -55,10 +56,10 @@ func getPlainData(groupedData map[string][]models.VacancyStats) []models.Vacancy
 	return plainData
 }
 
-func resolveDublicates(plainRawData []models.VacancyStats) ([]models.VacancyStats, int) {
-	uniqueStatsMap := make(map[string]models.VacancyStats)
+func resolveDublicates(plainRawData []dataModels.VacancyStats) ([]dataModels.VacancyStats, int) {
+	uniqueStatsMap := make(map[string]dataModels.VacancyStats)
 	totalDublicates := 0
-	var uniqueData []models.VacancyStats
+	var uniqueData []dataModels.VacancyStats
 
 	for _, stat := range plainRawData {
 		if _, ok := uniqueStatsMap[stat.ID]; ok {
@@ -74,12 +75,12 @@ func resolveDublicates(plainRawData []models.VacancyStats) ([]models.VacancyStat
 	return uniqueData, totalDublicates
 }
 
-func normalizeInputsAndOutputs(ontology []models.OntologyData, data []models.VacancyStats) ([]float32, []float32) {
+func normalizeInputsAndOutputs(ontology []configs.OntologyData, data []dataModels.VacancyStats) ([]float32, []float32) {
 	return nil, nil
 }
 
 // NormalizeRawData proceeds vacancies and normalize them for training set
-func NormalizeRawData(ontologyInfos []models.OntologyData, rawData map[string][]models.VacancyStats) (map[string][]int, []error) {
+func NormalizeRawData(ontologyInfos []configs.OntologyData, rawData map[string][]dataModels.VacancyStats) (map[string][]int, []error) {
 	errs := checkRawData(ontologyInfos, rawData)
 	if len(errs) > 0 {
 		return nil, errs

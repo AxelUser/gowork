@@ -3,14 +3,14 @@ package events
 import (
 	"fmt"
 
-	"github.com/AxelUser/gowork/models"
+	"github.com/AxelUser/gowork/models/dataModels"
 )
 
 // DataLoadedEvent is event for loaded data from HeadHunter API
 type DataLoadedEvent struct {
 	Skill string
 	URL   string
-	Data  []models.VacancyStats
+	Data  []dataModels.VacancyStats
 	Error error
 }
 
@@ -34,11 +34,11 @@ func (ev DataLoadedEvent) HasData() bool {
 }
 
 // NewDataLoadedEvent creates new DataLoadedEvent
-func NewDataLoadedEvent(skill string, url string, data []models.VacancyStats) DataLoadedEvent {
+func NewDataLoadedEvent(skill string, url string, data []dataModels.VacancyStats) DataLoadedEvent {
 	return DataLoadedEvent{Skill: skill, URL: url, Data: data, Error: nil}
 }
 
 // NewDataLoadedEventWithError creates new DataLoadedEvent with error object
-func NewDataLoadedEventWithError(skill string, url string, data []models.VacancyStats, err error) DataLoadedEvent {
+func NewDataLoadedEventWithError(skill string, url string, data []dataModels.VacancyStats, err error) DataLoadedEvent {
 	return DataLoadedEvent{Skill: skill, URL: url, Data: data, Error: err}
 }

@@ -1,4 +1,4 @@
-package models
+package dataModels
 
 // VacancyStats is for data about salary for vacancy
 type VacancyStats struct {

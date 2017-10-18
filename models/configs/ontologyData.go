@@ -1,4 +1,4 @@
-package models
+package configs
 
 // OntologyData stores rules and main info for loaded skill
 type OntologyData struct {

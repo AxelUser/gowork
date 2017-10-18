@@ -1,4 +1,4 @@
-package models
+package dataModels
 
 // TraingingSetItem contains skills for inputs and salary for output
 type TraingingSetItem struct {

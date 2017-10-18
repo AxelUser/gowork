@@ -1,4 +1,4 @@
-package models
+package configs
 
 // ParserQuery represents query for api
 type ParserQuery struct {
