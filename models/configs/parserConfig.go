@@ -1,4 +1,4 @@
-package models
+package configs
 
 // ParserConfig represents config for parser
 type ParserConfig struct {

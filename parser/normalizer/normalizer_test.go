@@ -7,13 +7,14 @@ import (
 	"testing"
 
 	"github.com/AxelUser/gowork/errors/normalizerErrors"
-	"github.com/AxelUser/gowork/models"
+	"github.com/AxelUser/gowork/models/configs"
+	"github.com/AxelUser/gowork/models/dataModels"
 )
 
-func createRawData(aliases []string, countPerSkill int, createUnique bool) map[string][]models.VacancyStats {
-	statsMap := make(map[string][]models.VacancyStats)
+func createRawData(aliases []string, countPerSkill int, createUnique bool) map[string][]dataModels.VacancyStats {
+	statsMap := make(map[string][]dataModels.VacancyStats)
 	for i, alias := range aliases {
-		var stats []models.VacancyStats
+		var stats []dataModels.VacancyStats
 		for j := 0; i < countPerSkill; i++ {
 			salaryFrom := (i + 1) * 10000
 			salaryTo := (i + 1) * 20000
@@ -24,7 +25,7 @@ func createRawData(aliases []string, countPerSkill int, createUnique bool) map[s
 			} else {
 				id = "1"
 			}
-			s := models.NewVacancyStats(id, "test.com", &salaryFrom, &salaryTo, "RUB")
+			s := dataModels.NewVacancyStats(id, "test.com", &salaryFrom, &salaryTo, "RUB")
 			stats = append(stats, s)
 		}
 		statsMap[alias] = stats
@@ -32,10 +33,10 @@ func createRawData(aliases []string, countPerSkill int, createUnique bool) map[s
 	return statsMap
 }
 
-func createOntology(aliases []string, emptyRules bool, addRuleForItself bool) []models.OntologyData {
-	var ontology []models.OntologyData
+func createOntology(aliases []string, emptyRules bool, addRuleForItself bool) []configs.OntologyData {
+	var ontology []configs.OntologyData
 	for _, alias := range aliases {
-		o := models.OntologyData{Alias: alias, Caption: alias}
+		o := configs.OntologyData{Alias: alias, Caption: alias}
 		if !emptyRules {
 			o.Rules = make(map[string]float32)
 			for _, skill := range aliases {

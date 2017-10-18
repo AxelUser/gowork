@@ -1,4 +1,4 @@
-package models
+package dataModels
 
 //LoaderJob is to store data to load vacancies per skill
 type LoaderJob struct {

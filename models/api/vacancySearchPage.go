@@ -1,4 +1,4 @@
-package models
+package api
 
 // VacancySearchPage is for search page from HeadHunter API
 type VacancySearchPage struct {
