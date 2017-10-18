@@ -15,7 +15,7 @@ func createRawData(aliases []string, countPerSkill int, createUnique bool) map[s
 	statsMap := make(map[string][]dataModels.VacancyStats)
 	for i, alias := range aliases {
 		var stats []dataModels.VacancyStats
-		for j := 0; i < countPerSkill; i++ {
+		for j := 0; j < countPerSkill; j++ {
 			salaryFrom := (i + 1) * 10000
 			salaryTo := (i + 1) * 20000
 
@@ -144,6 +144,19 @@ func TestResolveDublicates_HasDublicates_TotalCountEqualsActualCount(t *testing.
 
 	if actualDublicates != totalCount {
 		t.Errorf("Expect %d dublicates, but have %d", totalCount, actualDublicates)
+	}
+}
+
+func TestResolveDublicates_HasDublicates_AddsSkillsToDublicates(t *testing.T) {
+	raw := createRawData([]string{"js", "css", "html"}, 1, false)
+	plainData := getPlainData(raw)
+
+	dataWithoutDublicates, _ := resolveDublicates(plainData)
+
+	for _, stat := range dataWithoutDublicates {
+		if len(stat.Skills) != 3 {
+			t.Errorf("Expect 3 skills for ID <%s>, but have %d", stat.ID, len(stat.Skills))
+		}
 	}
 }
 

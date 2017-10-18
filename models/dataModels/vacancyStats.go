@@ -11,7 +11,7 @@ type VacancyStats struct {
 }
 
 // AddSkill adds skill to collections
-func (s VacancyStats) AddSkill(skill string) {
+func (s *VacancyStats) AddSkill(skill string) {
 	s.Skills = append(s.Skills, skill)
 }
 

@@ -64,12 +64,17 @@ func resolveDublicates(plainRawData []dataModels.VacancyStats) ([]dataModels.Vac
 	for _, stat := range plainRawData {
 		if _, ok := uniqueStatsMap[stat.ID]; ok {
 			// Adds skill for what it was loaded
-			uniqueStatsMap[stat.ID].AddSkill(stat.Skills[0])
+			dataUpd := uniqueStatsMap[stat.ID]
+			dataUpd.AddSkill(stat.Skills[0])
+			uniqueStatsMap[stat.ID] = dataUpd
 			totalDublicates++
 		} else {
 			uniqueStatsMap[stat.ID] = stat
-			uniqueData = append(uniqueData, stat)
 		}
+	}
+
+	for _, stat := range uniqueStatsMap {
+		uniqueData = append(uniqueData, stat)
 	}
 
 	return uniqueData, totalDublicates
