@@ -1,115 +1,50 @@
 package normalizer
 
 import (
-	"fmt"
-	"reflect"
-	"strconv"
 	"testing"
 
 	"github.com/AxelUser/gowork/errors/normalizerErrors"
-	"github.com/AxelUser/gowork/models/configs"
-	"github.com/AxelUser/gowork/models/dataModels"
+	"github.com/AxelUser/gowork/utils"
 )
 
-func createRawData(aliases []string, countPerSkill int, createUnique bool) map[string][]dataModels.VacancyStats {
-	statsMap := make(map[string][]dataModels.VacancyStats)
-	for i, alias := range aliases {
-		var stats []dataModels.VacancyStats
-		for j := 0; j < countPerSkill; j++ {
-			salaryFrom := (i + 1) * 10000
-			salaryTo := (i + 1) * 20000
-
-			var id string
-			if createUnique {
-				id = strconv.Itoa((i+1)*100000 + j)
-			} else {
-				id = "1"
-			}
-			s := dataModels.NewVacancyStats(id, "test.com", &salaryFrom, &salaryTo, "RUB", alias)
-			stats = append(stats, s)
-		}
-		statsMap[alias] = stats
-	}
-	return statsMap
-}
-
-func createOntology(aliases []string, emptyRules bool, addRuleForItself bool) []configs.OntologyData {
-	var ontology []configs.OntologyData
-	for _, alias := range aliases {
-		o := configs.OntologyData{Alias: alias, Caption: alias}
-		if !emptyRules {
-			o.Rules = make(map[string]float32)
-			for _, skill := range aliases {
-				if skill == alias {
-					if addRuleForItself {
-						o.Rules[skill] = 1
-					}
-				} else {
-					o.Rules[skill] = 0.1
-				}
-			}
-		}
-		ontology = append(ontology, o)
-	}
-
-	return ontology
-}
-
-func checkNormalizerErrorCode(errs []error, code int) error {
-	if len(errs) > 0 {
-		for _, err := range errs {
-			switch err.(type) {
-			case normalizerErrors.NormalizerError:
-				e := err.(normalizerErrors.NormalizerError)
-				if e.CaseCode == code {
-					return nil
-				}
-				return fmt.Errorf("NormalizerError is must be with code %d: %d", code, e.CaseCode)
-			}
-		}
-		return fmt.Errorf("Error is not NormalizerError: %s", reflect.TypeOf(errs[0]))
-	}
-	return fmt.Errorf("Expected error")
-}
-
 func TestCheckRawData_NoData_ReturnsError(t *testing.T) {
-	raw := createRawData([]string{"js", "css"}, 10, true)
-	ontology := createOntology([]string{"js", "css", "html"}, false, true)
+	raw := utils.CreateRawData([]string{"js", "css"}, 10, true)
+	ontology := utils.CreateOntology([]string{"js", "css", "html"}, false, true)
 
 	errs := checkRawData(ontology, raw)
 
-	err := checkNormalizerErrorCode(errs, normalizerErrors.CaseCodeMissingData)
+	err := utils.CheckNormalizerErrorCode(errs, normalizerErrors.CaseCodeMissingData)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestCheckRawData_EmptyRules_ReturnsErrors(t *testing.T) {
-	raw := createRawData([]string{"js", "css", "html"}, 10, true)
-	ontology := createOntology([]string{"js", "css", "html"}, true, false)
+	raw := utils.CreateRawData([]string{"js", "css", "html"}, 10, true)
+	ontology := utils.CreateOntology([]string{"js", "css", "html"}, true, false)
 
 	errs := checkRawData(ontology, raw)
 
-	err := checkNormalizerErrorCode(errs, normalizerErrors.CaseCodeEmptyRules)
+	err := utils.CheckNormalizerErrorCode(errs, normalizerErrors.CaseCodeEmptyRules)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestCheckRawData_MissingRulesForSameSkill_ReturnsError(t *testing.T) {
-	raw := createRawData([]string{"js", "css", "html"}, 10, true)
-	ontology := createOntology([]string{"js", "css", "html"}, false, false)
+	raw := utils.CreateRawData([]string{"js", "css", "html"}, 10, true)
+	ontology := utils.CreateOntology([]string{"js", "css", "html"}, false, false)
 
 	errs := checkRawData(ontology, raw)
 
-	err := checkNormalizerErrorCode(errs, normalizerErrors.CaseCodeOntologyMissingRuleForSameSkill)
+	err := utils.CheckNormalizerErrorCode(errs, normalizerErrors.CaseCodeOntologyMissingRuleForSameSkill)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestResolveDublicates_HasDublicates_ReturnsNoDublicates(t *testing.T) {
-	raw := createRawData([]string{"js", "css", "html"}, 10, false)
+	raw := utils.CreateRawData([]string{"js", "css", "html"}, 10, false)
 	plainData := getPlainData(raw)
 
 	stats, _ := resolveDublicates(plainData)
@@ -127,7 +62,7 @@ func TestResolveDublicates_HasDublicates_ReturnsNoDublicates(t *testing.T) {
 }
 
 func TestResolveDublicates_HasDublicates_TotalCountEqualsActualCount(t *testing.T) {
-	raw := createRawData([]string{"js", "css", "html"}, 10, false)
+	raw := utils.CreateRawData([]string{"js", "css", "html"}, 10, false)
 	plainData := getPlainData(raw)
 
 	_, totalCount := resolveDublicates(plainData)
@@ -148,7 +83,7 @@ func TestResolveDublicates_HasDublicates_TotalCountEqualsActualCount(t *testing.
 }
 
 func TestResolveDublicates_HasDublicates_AddsSkillsToDublicates(t *testing.T) {
-	raw := createRawData([]string{"js", "css", "html"}, 1, false)
+	raw := utils.CreateRawData([]string{"js", "css", "html"}, 1, false)
 	plainData := getPlainData(raw)
 
 	dataWithoutDublicates, _ := resolveDublicates(plainData)
@@ -161,8 +96,8 @@ func TestResolveDublicates_HasDublicates_AddsSkillsToDublicates(t *testing.T) {
 }
 
 func TestNormalizeRawData_IsCorrect_ReturnsCollection(t *testing.T) {
-	raw := createRawData([]string{"js", "css", "html"}, 10, true)
-	ontology := createOntology([]string{"js", "css", "html"}, false, true)
+	raw := utils.CreateRawData([]string{"js", "css", "html"}, 10, true)
+	ontology := utils.CreateOntology([]string{"js", "css", "html"}, false, true)
 
 	data, _ := NormalizeRawData(ontology, raw)
 
@@ -172,8 +107,8 @@ func TestNormalizeRawData_IsCorrect_ReturnsCollection(t *testing.T) {
 }
 
 func TestNormalizeRawData_IsNotCorrect_ReturnsError(t *testing.T) {
-	raw := createRawData([]string{"js", "css", "html"}, 10, true)
-	ontology := createOntology([]string{"js", "css"}, true, false)
+	raw := utils.CreateRawData([]string{"js", "css", "html"}, 10, true)
+	ontology := utils.CreateOntology([]string{"js", "css"}, true, false)
 
 	_, errs := NormalizeRawData(ontology, raw)
 
