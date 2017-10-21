@@ -34,7 +34,7 @@ func getVectorForSkills(ontology []configs.OntologyData, skillsOrder []string, s
 			for i, skillInOrder := range skillsOrder {
 				ruleValue := oSet.Rules[skillInOrder]
 				newValue := vector[i] + ruleValue
-				if newValue < maxVectorValue {
+				if newValue <= maxVectorValue {
 					vector[i] = newValue
 				}
 			}
