@@ -4,6 +4,7 @@ import (
 	nErrors "github.com/AxelUser/gowork/errors/normalizerErrors"
 	"github.com/AxelUser/gowork/models/configs"
 	"github.com/AxelUser/gowork/models/dataModels"
+	"github.com/AxelUser/gowork/parser/normalizer/selector"
 )
 
 func checkRawData(ontologyInfos []configs.OntologyData, rawData map[string][]dataModels.VacancyStats) []error {
@@ -21,10 +22,7 @@ func checkRawData(ontologyInfos []configs.OntologyData, rawData map[string][]dat
 			missingRules = append(missingRules, info.Alias)
 			missingRulesForThemselves = append(missingRulesForThemselves, info.Alias)
 		} else {
-			for skill := range info.Rules {
-				if skill == info.Alias {
-					continue
-				}
+			if _, ok := info.Rules[info.Alias]; !ok {
 				missingRulesForThemselves = append(missingRulesForThemselves, info.Alias)
 			}
 		}
@@ -85,7 +83,7 @@ func normalizeInputsAndOutputs(ontology []configs.OntologyData, data []dataModel
 }
 
 // NormalizeRawData proceeds vacancies and normalize them for training set
-func NormalizeRawData(ontologyInfos []configs.OntologyData, rawData map[string][]dataModels.VacancyStats) (map[string][]int, []error) {
+func NormalizeRawData(ontologyInfos []configs.OntologyData, rawData map[string][]dataModels.VacancyStats) ([]dataModels.TraingingSetItem, []error) {
 	errs := checkRawData(ontologyInfos, rawData)
 	if len(errs) > 0 {
 		return nil, errs
@@ -93,7 +91,7 @@ func NormalizeRawData(ontologyInfos []configs.OntologyData, rawData map[string][
 
 	plainData := getPlainData(rawData)
 
-	resolveDublicates(plainData)
+	uniqueData, _ := resolveDublicates(plainData)
 
-	return nil, nil
+	return selector.SelectSkills(ontologyInfos, uniqueData), nil
 }
