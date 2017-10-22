@@ -14,7 +14,7 @@ import (
 const currencyAPIBaseURL string = "http://api.fixer.io/latest?base="
 const baseCurrency string = "RUB"
 
-var loadedRates *api.CurrencyRates
+var baseCurrencyCodes = []string{"RUB", "RUR"}
 
 // Load is for loading latest currency rates
 func Load() (*api.CurrencyRates, error) {
@@ -39,27 +39,38 @@ func Load() (*api.CurrencyRates, error) {
 		return nil, errors.NewLoadDataError(currencyAPIBaseURL, rates.Error, nil)
 	}
 
-	loadedRates = &rates
 	return &rates, nil
 }
 
 // ConvertSalary returns VacancyStats with converted salary
-func ConvertSalary(stat dataModels.VacancyStats) dataModels.VacancyStats {
-	if stat.Currency == baseCurrency {
+func ConvertSalary(loadedRates api.CurrencyRates, stat dataModels.VacancyStats) dataModels.VacancyStats {
+	if !IsForeignCurrency(stat) {
 		return stat
 	}
 
 	curRate := loadedRates.Rates[stat.Currency]
+	var newSalaryFrom *float32
+	var newSalaryTo *float32
 
 	if stat.SalaryFrom != nil {
-		newSalary := *stat.SalaryFrom / curRate
-		stat.SalaryFrom = &newSalary
+		temp := *stat.SalaryFrom / curRate
+		newSalaryFrom = &temp
 	}
 
 	if stat.SalaryTo != nil {
-		newSalary := *stat.SalaryTo / curRate
-		stat.SalaryTo = &newSalary
+		temp := *stat.SalaryTo / curRate
+		newSalaryTo = &temp
 	}
 
-	return stat
+	return dataModels.NewVacancyStats(stat.ID, stat.URL, newSalaryFrom, newSalaryTo, baseCurrency)
+}
+
+// IsForeignCurrency check if VacancyStats has salary in foreign currency
+func IsForeignCurrency(stat dataModels.VacancyStats) bool {
+	for _, code := range baseCurrencyCodes {
+		if stat.Currency == code {
+			return false
+		}
+	}
+	return true
 }

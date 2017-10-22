@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/AxelUser/gowork/parser/loader/currencyLoader"
+
 	"github.com/AxelUser/gowork/errors"
 	"github.com/AxelUser/gowork/events"
 	"github.com/AxelUser/gowork/models/api"
@@ -209,6 +211,25 @@ func Load(config configs.ParserConfig) (map[string][]dataModels.VacancyStats, er
 
 	elapsed := time.Since(timeStart)
 	log.Printf("Loaded %d item(s) in %s\n", totalCount, elapsed)
+
+	log.Println("Loading latest currency rates for RUB")
+	rates, err := currencyLoader.Load()
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("Loaded rates for %s", rates.Date)
+
+	log.Println("Converting vacancies with foreign currencies")
+	totalConvertions := 0
+	for alias, group := range allStats {
+		for i, stat := range group {
+			if currencyLoader.IsForeignCurrency(stat) {
+				allStats[alias][i] = currencyLoader.ConvertSalary(*rates, stat)
+				totalConvertions++
+			}
+		}
+	}
+	log.Printf("Converted %d item(s)", totalConvertions)
 
 	return allStats, nil
 }
