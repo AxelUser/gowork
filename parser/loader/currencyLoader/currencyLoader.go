@@ -12,13 +12,15 @@ import (
 )
 
 const currencyAPIBaseURL string = "http://api.fixer.io/latest?base="
-const baseCurrency string = "RUB"
+
+// BaseCurrency is currency for which rates are loaded
+const BaseCurrency string = "RUB"
 
 var baseCurrencyCodes = []string{"RUB", "RUR"}
 
 // Load is for loading latest currency rates
 func Load() (*api.CurrencyRates, error) {
-	resp, err := http.Get(currencyAPIBaseURL + baseCurrency)
+	resp, err := http.Get(currencyAPIBaseURL + BaseCurrency)
 	if err != nil {
 		return nil, errors.NewLoadDataError(currencyAPIBaseURL, "", err)
 	}
@@ -62,7 +64,7 @@ func ConvertSalary(loadedRates api.CurrencyRates, stat dataModels.VacancyStats) 
 		newSalaryTo = &temp
 	}
 
-	return dataModels.NewVacancyStats(stat.ID, stat.URL, newSalaryFrom, newSalaryTo, baseCurrency)
+	return dataModels.NewVacancyStats(stat.ID, stat.URL, newSalaryFrom, newSalaryTo, BaseCurrency)
 }
 
 // IsForeignCurrency check if VacancyStats has salary in foreign currency

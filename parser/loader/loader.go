@@ -212,10 +212,10 @@ func Load(config configs.ParserConfig) (map[string][]dataModels.VacancyStats, er
 	elapsed := time.Since(timeStart)
 	log.Printf("Loaded %d item(s) in %s\n", totalCount, elapsed)
 
-	log.Println("Loading latest currency rates for RUB")
+	log.Printf("Loading latest currency rates for %s ", currencyLoader.BaseCurrency)
 	rates, err := currencyLoader.Load()
 	if err != nil {
-		return nil, err
+		return allStats, err
 	}
 	log.Printf("Loaded rates for %s", rates.Date)
 
