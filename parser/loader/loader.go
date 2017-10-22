@@ -20,6 +20,22 @@ import (
 	"github.com/AxelUser/gowork/models/dataModels"
 )
 
+// Load data from HeadHunter API
+func Load(config configs.ParserConfig) (map[string][]dataModels.VacancyStats, error) {
+
+	allStats, err := loadVacancyStatsForAllSkills(config)
+	if err != nil {
+		return allStats, err
+	}
+
+	convertedStats, err := convertSalariesToBaseCurrency(allStats)
+	if err != nil {
+		return convertedStats, err
+	}
+
+	return convertedStats, nil
+}
+
 func createBaseURL(config configs.ParserConfig) (string, error) {
 	url, err := urlModule.Parse(config.URL)
 	if err != nil {
@@ -188,8 +204,7 @@ func loadAll(urls map[string]string, count int) (map[string][]dataModels.Vacancy
 	return all, totalCount, nil
 }
 
-// Load data from HeadHunter API
-func Load(config configs.ParserConfig) (map[string][]dataModels.VacancyStats, error) {
+func loadVacancyStatsForAllSkills(config configs.ParserConfig) (map[string][]dataModels.VacancyStats, error) {
 	timeStart := time.Now()
 
 	allStats := make(map[string][]dataModels.VacancyStats)
@@ -212,6 +227,10 @@ func Load(config configs.ParserConfig) (map[string][]dataModels.VacancyStats, er
 	elapsed := time.Since(timeStart)
 	log.Printf("Loaded %d item(s) in %s\n", totalCount, elapsed)
 
+	return allStats, nil
+}
+
+func convertSalariesToBaseCurrency(allStats map[string][]dataModels.VacancyStats) (map[string][]dataModels.VacancyStats, error) {
 	log.Printf("Loading latest currency rates for %s ", currencyLoader.BaseCurrency)
 	rates, err := currencyLoader.Load()
 	if err != nil {
