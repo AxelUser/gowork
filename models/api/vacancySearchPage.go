@@ -5,10 +5,10 @@ type VacancySearchPage struct {
 	Clusters interface{} `json:"clusters"`
 	Items    []struct {
 		Salary struct {
-			To       *int   `json:"to"`
-			Gross    bool   `json:"gross"`
-			From     *int   `json:"from"`
-			Currency string `json:"currency"`
+			To       *float32 `json:"to"`
+			Gross    bool     `json:"gross"`
+			From     *float32 `json:"from"`
+			Currency string   `json:"currency"`
 		} `json:"salary"`
 		Snippet struct {
 			Requirement    interface{} `json:"requirement"`

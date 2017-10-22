@@ -7,9 +7,7 @@ import (
 	"github.com/AxelUser/gowork/parser/normalizer/selector"
 )
 
-func normalizeInputsAndOutputs(ontology []configs.OntologyData, data []dataModels.VacancyStats) ([]float32, []float32) {
-	return nil, nil
-}
+const maxVacancySalaryInRubles = 1000000
 
 // NormalizeRawData proceeds vacancies and normalize them for training set
 func NormalizeRawData(ontologyInfos []configs.OntologyData, rawData map[string][]dataModels.VacancyStats) ([]dataModels.TraingingSetItem, []error) {

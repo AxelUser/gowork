@@ -4,8 +4,8 @@ package dataModels
 type VacancyStats struct {
 	ID         string
 	URL        string
-	SalaryFrom *int
-	SalaryTo   *int
+	SalaryFrom *float32
+	SalaryTo   *float32
 	Currency   string
 	Skills     []string
 }
@@ -16,7 +16,7 @@ func (s *VacancyStats) AddSkill(skill string) {
 }
 
 // NewVacancyStats creates VacancyStats
-func NewVacancyStats(id string, url string, salaryFrom *int, salaryTo *int, currency string, skills ...string) VacancyStats {
+func NewVacancyStats(id string, url string, salaryFrom *float32, salaryTo *float32, currency string, skills ...string) VacancyStats {
 	return VacancyStats{
 		ID:         id,
 		URL:        url,

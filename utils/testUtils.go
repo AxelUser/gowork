@@ -15,8 +15,8 @@ func CreateRawData(aliases []string, countPerSkill int, createUnique bool) map[s
 	for i, alias := range aliases {
 		var stats []dataModels.VacancyStats
 		for j := 0; j < countPerSkill; j++ {
-			salaryFrom := (i + 1) * 10000
-			salaryTo := (i + 1) * 20000
+			salaryFrom := float32((i + 1) * 10000)
+			salaryTo := float32((i + 1) * 20000)
 
 			var id string
 			if createUnique {
