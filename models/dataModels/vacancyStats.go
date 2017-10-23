@@ -4,8 +4,8 @@ package dataModels
 type VacancyStats struct {
 	ID         string
 	URL        string
-	SalaryFrom float32
-	SalaryTo   float32
+	SalaryFrom float64
+	SalaryTo   float64
 	Currency   string
 	Skills     []string
 }
@@ -16,19 +16,19 @@ func (s *VacancyStats) AddSkill(skill string) {
 }
 
 // NewVacancyStats creates VacancyStats
-func NewVacancyStats(id string, url string, salaryFrom *float32, salaryTo *float32, currency string, skills ...string) VacancyStats {
-	var restoredSalaryFrom float32
-	var restoredSalaryTo float32
+func NewVacancyStats(id string, url string, salaryFrom *float64, salaryTo *float64, currency string, skills ...string) VacancyStats {
+	var restoredSalaryFrom float64
+	var restoredSalaryTo float64
 
 	if salaryFrom == nil && salaryTo != nil {
 		restoredSalaryFrom = *salaryTo
-	} else {
+	} else if salaryFrom != nil {
 		restoredSalaryFrom = *salaryFrom
 	}
 
 	if salaryTo == nil && salaryFrom != nil {
 		restoredSalaryTo = *salaryFrom
-	} else {
+	} else if salaryTo != nil {
 		restoredSalaryTo = *salaryTo
 	}
 
