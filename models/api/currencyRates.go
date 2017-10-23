@@ -4,6 +4,6 @@ package api
 type CurrencyRates struct {
 	Base  string             `json:"base"`
 	Date  string             `json:"date"`
-	Rates map[string]float32 `json:"rates"`
+	Rates map[string]float64 `json:"rates"`
 	Error string             `json:"error"`
 }
