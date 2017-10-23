@@ -51,20 +51,10 @@ func ConvertSalary(loadedRates api.CurrencyRates, stat dataModels.VacancyStats) 
 	}
 
 	curRate := loadedRates.Rates[stat.Currency]
-	var newSalaryFrom *float32
-	var newSalaryTo *float32
+	newSalaryFrom := stat.SalaryFrom / curRate
+	newSalaryTo := stat.SalaryTo / curRate
 
-	if stat.SalaryFrom != nil {
-		temp := *stat.SalaryFrom / curRate
-		newSalaryFrom = &temp
-	}
-
-	if stat.SalaryTo != nil {
-		temp := *stat.SalaryTo / curRate
-		newSalaryTo = &temp
-	}
-
-	return dataModels.NewVacancyStats(stat.ID, stat.URL, newSalaryFrom, newSalaryTo, BaseCurrency)
+	return dataModels.NewVacancyStats(stat.ID, stat.URL, &newSalaryFrom, &newSalaryTo, BaseCurrency)
 }
 
 // IsForeignCurrency check if VacancyStats has salary in foreign currency
